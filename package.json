@@ -1,0 +1,21 @@
+{
+  "name": "drive-sync",
+  "version": "1.0.0",
+  "description": "To generate a native terminal application which can be used to sync your Google Drive with a local folder.",
+  "main": "index.js",
+  "dependencies": {
+    "googleapis": "0.8.*",
+    "google-auth-library": "0.9.*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saurabhbatra96/drive-sync.git"
+  },
+  "keywords": [],
+  "author": "saurabhbatra96, sagarmanchanda",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/saurabhbatra96/drive-sync/issues"
+  },
+  "homepage": "https://github.com/saurabhbatra96/drive-sync#readme"
+}
