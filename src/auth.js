@@ -1,5 +1,7 @@
 // auth.js
 
+// Code for authenticating the user.
+
 var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
@@ -13,7 +15,7 @@ var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
 var TOKEN_PATH = TOKEN_DIR + 'drive-sync-auth.json';
 
 // Load client secrets from a local file.
-fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+fs.readFile('../client_secret.json', function processClientSecrets(err, content) {
   if (err) {
     console.log('Error loading client secret file: ' + err);
     return;
@@ -98,5 +100,5 @@ function storeToken(token) {
 
 function authSuccess(auth) {
 	console.log("Success!");
-	return auth;
+  GLOBAL.authtoken = auth;
 }
