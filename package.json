@@ -11,6 +11,9 @@
     "type": "git",
     "url": "git+https://github.com/saurabhbatra96/drive-sync.git"
   },
+  "bin": {
+    "drive-sync": "index.js"
+  },
   "keywords": [],
   "author": "saurabhbatra96, sagarmanchanda",
   "license": "MIT",
