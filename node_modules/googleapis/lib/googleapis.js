@@ -1,259 +1,215 @@
-/**
- * Copyright 2012 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2012-2016, Google, Inc.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-var async = require('async'),
-    Cache = require('./cache.js'),
-    Client = require('./client.js'),
-    DefaultTransporter = require('./transporters.js'),
-    qs = require('querystring'),
-    requests = require('./requests.js'),
-    fs = require('fs');
+'use strict';
+
+var path = require('path');
+var fs = require('fs');
+var util = require('util');
+var Discovery = require('./discovery');
+var discovery = new Discovery({ debug: false, includePrivate: false });
 
 /**
- * @constructor
- * GoogleApisClient constructor.
- * @param {OAuth2Client} authClient OAuth2Client for authentication
- */
-function GoogleApisClient(authClient) {
-  this.authClient = authClient;
-}
-
-/**
- * Add a new individual client to the instance.
- * @param {String} name
- * @param {Client} client
- */
-GoogleApisClient.prototype.add = function(name, client) {
-  this[name] = client;
-};
-
-/**
- * Creates a new batch request.
- * @return {BatchRequest} New batch request.
- */
-GoogleApisClient.prototype.newBatchRequest = function() {
-  return new requests.BatchRequest()
-    .withAuthClient(this.authClient);
-};
-
-/**
- * @constructor
- * @param {transporters.DefaultTransporter=} opt_transporter
- * GoogleApis constructor.
- */
-function GoogleApis(opt_transporter) {
-  this.opts = {};
-  this.toBeDiscovered = [];
-  this.transporter = opt_transporter || new DefaultTransporter();
-  this.authClient = null;
-}
-
-/**
- * @const
+ * Load the apis from apis index file
+ * This file holds all version information
  * @private
- * Base path for discovery API.
- * @type {string}
  */
-GoogleApis.BASE_DISCOVERY_URL_ =
-  'https://www.googleapis.com/discovery/v1/apis/';
+var apis = {};
 
 /**
- * @const
+ * Return a Function that requires an API from the disk
+ * @param  {String} filename Filename of API
+ * @return {function}        function used to require the API from disk
  * @private
- * Discovery type.
- * @type {string}
  */
-// TODO(burcud): Switch to REST.
-GoogleApis.DISCOVERY_TYPE_ = 'rest';
-
-/**
- * @const
- * @private
- * Additional discovery parameters.
- * @type {object}
- */
-GoogleApis.DISCOVERY_PARAMS_ = null;
-
-/**
- * Discover the API with the given name, version and opt options.
- * @param  {String} name The name of the API.
- * @param  {String} version The version of the API.
- * @param  {Object} opt_opts Additional options.
- * @return {GoogleApis} Returns itself.
- */
-GoogleApis.prototype.discover = function(name, version, opt_opts) {
-  var alreadyDiscovered = this.toBeDiscovered.some(function(discovery) {
-    return (discovery.name === name);
-  });
-
-  if (!alreadyDiscovered) {
-    this.toBeDiscovered.push({
-        name: name, version: version, opts: opt_opts });
-  }
-  return this;
-};
-
-/**
- * Executes requests to discover APIs.
- * @param  {Function=} opt_callback
- */
-GoogleApis.prototype.execute = function(opt_callback) {
-  var that = this,
-      operations = [],
-      client = new GoogleApisClient(this.authClient);
-
-  this.toBeDiscovered.forEach(function(obj) {
-    operations.push(function(callback) {
-      that.load.call(that, obj, callback);
-    });
-  });
-
-  async.parallel(operations, function(err, results) {
-    if (err) {
-      opt_callback && opt_callback(err, null);
+function requireAPI (filename) {
+  return function (options) {
+    var type = typeof options;
+    var version;
+    if (type === 'string') {
+      version = options;
+      options = {};
+    } else if (type === 'object') {
+      version = options.version;
+      delete options.version;
     } else {
-      results = results || [];
-      results.forEach(function(result) {
-        // extend client object with indivual clients.
-        client.add(result.getName(), result);
-      });
-      opt_callback && opt_callback(null, client);
+      throw new Error('Argument error: Accepts only string or object');
     }
-  });
-};
-
-/**
- * Generates a client through discovery API.
- * @param {String} api An object to represent the api name, version and opts.
- * @param {Function=} opt_callback Optional callback function.
- */
-GoogleApis.prototype.load = function(api, opt_callback) {
-  var that = this;
-  var cache = new Cache(this.opts.cache);
-
-  if (api.opts && api.opts.localDiscoveryFilePath) {
-    that.loadFromFile(api.opts.localDiscoveryFilePath, opt_callback);
-    return;
-  }
-
-  var generateClient = function(err, data) {
-    var client = null;
-    if (!err && data) {
-      cache.write(api, data);
-      client = new Client(data, that.authClient);
+    try {
+      var endpointPath = path.join(__dirname, filename, path.basename(version));
+      var Endpoint = require(endpointPath);
+      var ep = new Endpoint(options);
+      ep.google = this; // for drive.google.transporter
+      return Object.freeze(ep); // create new & freeze
+    } catch (e) {
+      throw new Error(util.format('Unable to load endpoint %s("%s"): %s',
+        filename, version, e.message));
     }
-    opt_callback && opt_callback(err, client);
   };
+}
 
-  var data = cache.load(api);
-  if (data) {
-    generateClient(null, data);
-  } else {
-    that.transporter.request({
-      uri: that.generateDiscoveryUrl(api), json: true
-    }, generateClient);
+// Dynamically discover available APIs
+fs.readdirSync(path.join(__dirname, '../apis')).forEach(function (file) {
+  apis[file] = requireAPI('../apis/' + file);
+});
+
+/**
+ * @class GoogleAuth
+ */
+var GoogleAuth = require('google-auth-library');
+
+/**
+ * GoogleApis constructor.
+ *
+ * @example
+ * var GoogleApis = require('googleapis').GoogleApis;
+ * var google = new GoogleApis();
+ *
+ * @class GoogleApis
+ * @param {Object} [options] Configuration options.
+ */
+function GoogleApis (options) {
+  this.options(options);
+  this.addAPIs(apis);
+
+  /**
+   * A reference to an instance of GoogleAuth.
+   *
+   * @name GoogleApis#auth
+   * @type {GoogleAuth}
+   */
+  this.auth = new GoogleAuth();
+
+  /**
+   * A reference to the {@link GoogleApis} constructor function.
+   *
+   * @name GoogleApis#GoogleApis
+   * @see GoogleApis
+   * @type {Function}
+   */
+  this.GoogleApis = GoogleApis;
+}
+
+/**
+ * Set options.
+ *
+ * @param  {Object} [options] Configuration options.
+ */
+GoogleApis.prototype.options = function (options) {
+  this._options = options || {};
+};
+
+/**
+ * Add APIs endpoints to googleapis object
+ * E.g. googleapis.drive and googleapis.datastore
+ *
+ * @name GoogleApis#addAPIs
+ * @method
+ * @param {Object} apis Apis to be added to this GoogleApis instance.
+ * @private
+ */
+GoogleApis.prototype.addAPIs = function (apis) {
+  for (var apiName in apis) {
+    this[apiName] = apis[apiName].bind(this);
   }
 };
 
 /**
- * Generates a client from a local discovery file.
- * @param {String} filename Path of the local discovery file.
- * @param {Function=} opt_callback Optional callback function.
+ * Dynamically generate an apis object that can provide Endpoint objects for the
+ * discovered APIs.
+ *
+ * @example
+ * var google = require('googleapis');
+ * var discoveryUrl = 'https://myapp.appspot.com/_ah/api/discovery/v1/apis/';
+ * google.discover(discoveryUrl, function (err) {
+ *   var someapi = google.someapi('v1');
+ * });
+ *
+ * @name GoogleApis#discover
+ * @method
+ * @param {string} url Url to the discovery service for a set of APIs. e.g.,
+ * https://www.googleapis.com/discovery/v1/apis
+ * @param {Function} callback Callback function.
  */
-GoogleApis.prototype.loadFromFile = function(filename, opt_callback) {
-  var that = this;
+GoogleApis.prototype.discover = function (url, callback) {
+  var self = this;
 
-  fs.readFile(filename, function(err, data) {
-    var client = null;
-    if (!err && data) {
-      client = new Client(JSON.parse(data), that.authClient);
+  discovery.discoverAllAPIs(url, function (err, apis) {
+    if (err) {
+      return callback(err);
     }
-    opt_callback && opt_callback(err, client);
+    self.addAPIs(apis);
+    callback();
   });
 };
 
 /**
- * Generates the discovery url.
- * @param {String} api An object to represent the api name, version and opts.
- * @return {string} discoveryUrl.
+ * Dynamically generate an Endpoint object from a discovery doc.
+ *
+ * @example
+ * var google = require('google');
+ * var discoveryDocUrl = 'https://myapp.appspot.com/_ah/api/discovery/v1/apis/someapi/v1/rest';
+ * google.discoverApi(discoveryDocUrl, function (err, someapi) {
+ *   // use someapi
+ * });
+ *
+ * @name GoogleApis#discoverAPI
+ * @method
+ * @param {string} path Url or file path to discover doc for a single API.
+ * @param {object} [options] Options to configure the Endpoint object generated
+ * from the discovery doc.
+ * @param {Function} callback Callback function.
  */
-GoogleApis.prototype.generateDiscoveryUrl = function(api) {
-  api.opts = api.opts || {};
-  var baseDiscoveryUrl = api.opts.baseDiscoveryUrl ||
-      GoogleApis.BASE_DISCOVERY_URL_;
-
-  var discoveryParams = api.opts.discoveryParams ||
-      GoogleApis.DISCOVERY_PARAMS_;
-
-  var discoveryUrl = baseDiscoveryUrl;
-  discoveryUrl += encodeURIComponent(api.name) +
-      '/' + encodeURIComponent(api.version) +
-      '/' + GoogleApis.DISCOVERY_TYPE_;
-
-  if (discoveryParams) {
-    discoveryUrl += '?' + qs.stringify(discoveryParams);
+GoogleApis.prototype.discoverAPI = function (path, options, callback) {
+  var self = this;
+  if (typeof options === 'function') {
+    callback = options;
+    options = {};
   }
-
-  return discoveryUrl;
+  if (!options) {
+    options = {};
+  }
+  discovery.discoverAPI(path, function (err, Endpoint) {
+    if (err) {
+      return callback(err);
+    }
+    var ep = new Endpoint(options);
+    ep.google = self; // for drive.google.transporter
+    return callback(null, Object.freeze(ep)); // create new & freeze
+  });
 };
 
 /**
- * Adds options.
+ * {@link GoogleApis} class.
  *
- * @param {object} opts Options.
- * @return {GoogleApis} Returns itself.
+ * @name module:googleapis.GoogleApis
+ * @see GoogleApis
+ * @type {Function}
  */
-GoogleApis.prototype.withOpts = function(opts) {
-  this.opts = opts;
-  return this;
-};
 
 /**
- * Adds global auth client.
+ * {@link GoogleAuth} class.
  *
- * @param {auth.AuthClient} client An auth client instance.
- * @return {GoogleApis} Returns itself.
+ * @name module:googleapis.auth
+ * @see GoogleAuth
+ * @type {Function}
  */
-GoogleApis.prototype.withAuthClient = function(client) {
-  this.authClient = client;
-  return this;
-};
-
-var googleapis = new GoogleApis();
 
 /**
- * Shortcut to GoogleApis.
+ * @example
+ * var google = require('googleapis');
+ *
+ * @module googleapis
+ * @type {GoogleApis}
  */
-googleapis.GoogleApis = GoogleApis;
-
-/**
- * Shortcut to OAuth2Client.
- */
-googleapis.OAuth2Client = require('./auth/oauth2client.js');
-
-/**
- * Shortcut to Auth.
- */
-googleapis.auth = {
-  Compute: require('./auth/computeclient.js'),
-  JWT: require('./auth/jwtclient.js'),
-  OAuth2: googleapis.OAuth2Client
-};
-
-/**
- * Exports googleapis.
- */
-module.exports = googleapis;
+module.exports = new GoogleApis();

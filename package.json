@@ -5,8 +5,8 @@
   "main": "index.js",
   "dependencies": {
     "commander": "^2.9.0",
-    "google-auth-library": "0.9.*",
-    "googleapis": "0.8.*"
+    "google-auth-library": "^0.9.8",
+    "googleapis": "^7.1.0"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,9 @@
-tests/*
-examples/*
-.cache/*
-b041042364d89046c003ca151a6254ef/*
+test
+samples
+doc
+node_modules
+coverage
+jsdoc-conf.json
+.travis.yml
+# Empty API
+apis/iam/v1alpha1.js
