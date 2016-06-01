@@ -19,7 +19,7 @@ var TOKEN_PATH = TOKEN_DIR + 'drive-sync-auth.json';
 
 module.exports = function() {
   try {
-    var clientsecret = fs.readFileSync('../client_secret.json');  
+    var clientsecret = fs.readFileSync('client_secret.json');  
   } catch(e) {
     if(e.errno == 34) {
       console.log("Client Secret file missing.");
