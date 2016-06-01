@@ -5,8 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "commander": "^2.9.0",
+    "deasync": "^0.1.7",
     "google-auth-library": "^0.9.8",
-    "googleapis": "^7.1.0"
+    "googleapis": "^7.1.0",
+    "readline-sync": "^1.4.2"
   },
   "repository": {
     "type": "git",
