@@ -32,6 +32,19 @@ Currently the working CLI options include:
     - `Change working directory to the one above.`
     - `Change working directory to root.`
 
+- **down**
+	- `Usage:`
+		- `$ drive-sync down <file-name>`
+		- `$ drive-sync down all` (Not yet implemented.)
+		- `$ drive-sync down all --filter` (Not yet implemented.)
+	- `Description:`
+		- `Download <file-name> from Drive to the directory you are currently in.`
+		- `Download all the files in the directory you are currently in.`
+		- `Download all files matching the following filters:`
+			- `image: all files of the type image (png, jpg, gif, svg)`
+			- `pdf: all files of the type pdf`
+			- `zip: all files of the type zip`
+
 - **logout**
 	- `Usage: $ drive-sync logout`
 	- `Description: Logout from your account.`
