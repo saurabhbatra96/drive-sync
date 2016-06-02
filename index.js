@@ -8,8 +8,14 @@ global.appRoot = path.resolve(__dirname);
 var program = require('commander');
 var fs = require('fs');
 
-// Various default state controls.
-var pwdjson = fs.readFileSync(appRoot+'/config.json');
+// Current directory state control.
+try {
+	var pwdjson = fs.readFileSync(appRoot+'/config.json');
+} catch(e) {
+	var defaultPwd = "{ \"pwd\": \"root\"}";
+	fs.writeFileSync(appRoot+'/config.json', defaultPwd);
+	var pwdjson = defaultPwd;
+}
 var pwdcontents = JSON.parse(pwdjson);
 global.pwd = pwdcontents.pwd;
 
