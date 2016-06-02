@@ -5,6 +5,7 @@
 
 var listFiles = require(appRoot+'/src/ls.js');
 var changeDir = require(appRoot+'/src/cd.js');
+var currDir = require(appRoot+'/src/pwd.js');
 
 module.exports = function(cmd, value) {
 	switch(cmd) {
@@ -13,6 +14,9 @@ module.exports = function(cmd, value) {
 			break;
 		case 'cd':
 			changeDir(value, pwd);
+			break;
+		case 'pwd':
+			currDir(pwd);
 			break;
 	}
 }

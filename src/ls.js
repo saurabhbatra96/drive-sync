@@ -19,7 +19,7 @@ module.exports = function (pwd) {
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
-      		return;
+      return;
 		}
 
 		var files = response.files;
