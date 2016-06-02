@@ -19,7 +19,7 @@ var TOKEN_PATH = TOKEN_DIR + 'drive-sync-auth.json';
 
 module.exports = function() {
   try {
-    var clientsecret = fs.readFileSync(appRoot+'/client_secret.json');  
+    var clientsecret = fs.readFileSync(appRoot+'/client_secret.json');
   } catch(e) {
     if(e.code == 'ENOENT') {
       console.log("Client Secret file missing.");
@@ -55,7 +55,7 @@ function getNewToken(oauth2Client) {
     scope: SCOPES
   });
   console.log('Authorize this app by visiting this url: ', authUrl);
-  
+
   var code = readlineSync.question('Enter the code given on that page here: ');
 
   var authtoken = {};
@@ -85,7 +85,4 @@ function storeToken(token) {
     }
   }
   fs.writeFile(TOKEN_PATH, JSON.stringify(token));
-  console.log('Token stored to ' + TOKEN_PATH);
 }
-
-

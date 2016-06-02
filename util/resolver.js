@@ -2,10 +2,10 @@
 // corresponding arguments to their respective functions.
 
 // Requirements of various CLI utilities.
-
 var listFiles = require(appRoot+'/src/ls.js');
 var changeDir = require(appRoot+'/src/cd.js');
 var currDir = require(appRoot+'/src/pwd.js');
+var logout = require(appRoot+'/src/logout.js');
 
 module.exports = function(cmd, value) {
 	switch(cmd) {
@@ -17,6 +17,9 @@ module.exports = function(cmd, value) {
 			break;
 		case 'pwd':
 			currDir(pwd);
+			break;
+		case 'logout':
+			logout();
 			break;
 	}
 }
