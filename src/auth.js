@@ -21,7 +21,7 @@ module.exports = function() {
   try {
     var clientsecret = fs.readFileSync(appRoot+'/client_secret.json');  
   } catch(e) {
-    if(e.errno == 34) {
+    if(e.code == 'ENOENT') {
       console.log("Client Secret file missing.");
       return;
     }
