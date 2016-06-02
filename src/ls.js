@@ -6,6 +6,7 @@
 var deasync = require('deasync');
 var google = require('googleapis');
 var authtoken = require(appRoot+'/src/auth.js');
+var tablify = require(appRoot+'/util/tablify.js');
 var auth = authtoken();
 
 module.exports = function (pwd) {
@@ -26,10 +27,7 @@ module.exports = function (pwd) {
 		if (files.length == 0) {
       		console.log('Empty directory.');
     	} else {
-      		for (var i = 0; i < files.length; i++) {
-        		var file = files[i];
-        		console.log('%s\t (%s)', file.name, file.mimeType);
-      		}
+      		tablify('ls', files);
     	}
     	sync = false;
 	});
