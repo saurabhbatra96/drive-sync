@@ -18,11 +18,11 @@ $ npm link
 ## Usage
 Currently the working CLI options include:
 
-- ls
+- **ls** (List Files)
 	- `Usage: $ drive-sync ls`
 	- `Description: List files in current folder.`
 
-- cd
+- **cd** (Change Working Directory)
   - `Usage:`
     - `$ drive-sync cd <folder-name>`
     - `$ drive-sync cd ..`
