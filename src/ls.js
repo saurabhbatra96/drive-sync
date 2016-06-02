@@ -5,7 +5,7 @@
 
 var deasync = require('deasync');
 var google = require('googleapis');
-var authtoken = require('./auth.js');
+var authtoken = require(appRoot+'/src/auth.js');
 var auth = authtoken();
 
 module.exports = function (pwd) {
