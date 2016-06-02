@@ -6,15 +6,22 @@ var path = require('path');
 global.appRoot = path.resolve(__dirname);
 
 var program = require('commander');
-
-// Requirements of various CLI utilities.
-var listFiles = require(appRoot+'/src/ls.js');
+var fs = require('fs');
 
 // Various default state controls.
-var pwd = 'root';
+var pwdjson = fs.readFileSync(appRoot+'/config.json');
+var pwdcontents = JSON.parse(pwdjson);
+global.pwd = pwdcontents.pwd;
 
+// Our command resolver.
+var resolver = require(appRoot+'/util/resolver.js');
+
+// Send the command to our resolver.
 program
 	.version('0.0.1')
-	.command('ls')
-	.description('List files in current folder.')
-	.action(listFiles(pwd));
+	.arguments('<cmd> [value]')
+	.action(function(cmd, value) {
+		resolver(cmd, value);
+	});
+
+program.parse(process.argv);

@@ -14,7 +14,8 @@ module.exports = function (pwd) {
 	service.files.list({
 		q: "'"+pwd+"' in parents",
 		auth: auth,
-		fields: "files(name, mimeType)"
+		fields: "files(name, mimeType, id)",
+		orderBy: 'folder'
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
