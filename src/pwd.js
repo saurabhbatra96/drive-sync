@@ -5,6 +5,7 @@
 
 var deasync = require('deasync');
 var google = require('googleapis');
+var tablify = require(appRoot+'/util/tablify.js');
 var authtoken = require(appRoot+'/src/auth.js');
 var auth = authtoken();
 
@@ -14,15 +15,13 @@ module.exports = function (pwd) {
   service.files.get({
     fileId: pwd,
     auth: auth,
-    fields: "name,modifiedTime"
+    fields: "name,modifiedTime,owners(displayName)"
   }, function(err, response) {
     if (err) {
       console.log('The API returned an error: ' + err);
       return;
     }
-
-    console.log('Name\tLast Modified');
-    console.log('%s\t%s', response.name, response.modifiedTime);
+    tablify('pwd', response);
     sync = false;
   });
 

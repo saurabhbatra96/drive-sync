@@ -7,6 +7,9 @@ module.exports = function(entity, obj) {
     case 'ls':
       tablifyLs(obj);
       break;
+    case 'pwd':
+      tablifyPwd(obj);
+      break;
   }
 }
 
@@ -58,17 +61,31 @@ function beautifyLs(file) {
       file.name = colors.yellow(file.name);
       break;
     case 'image/gif':
-      file.mimeType = colors.green('Image Gif');
+      file.mimeType = colors.green('Gif Image');
       file.name = colors.green(file.name);
       break;
     case 'image/jpeg':
-      file.mimeType = colors.green('Image JPEG');
+      file.mimeType = colors.green('JPEG Image');
       file.name = colors.green(file.name);
       break;
     case 'image/png':
-      file.mimeType = colors.green('Image PNG');
+      file.mimeType = colors.green('PNG Image');
       file.name = colors.green(file.name);
       break;
   }
   return file;
+}
+
+function tablifyPwd(folder) {
+  var table = new Table({
+    chars: { 'top': '' , 'top-mid': '' , 'top-left': '' , 'top-right': ''
+         , 'bottom': '' , 'bottom-mid': '' , 'bottom-left': '' , 'bottom-right': ''
+         , 'left': '' , 'left-mid': '' , 'mid': '' , 'mid-mid': ''
+         , 'right': '' , 'right-mid': '' , 'middle': '\t' },
+    head: ['Name', 'Last Modified', 'Owner']
+  });
+
+  folder.owners[0].displayName = colors.red(folder.owners[0].displayName);
+  table.push([folder.name, folder.modifiedTime, folder.owners[0].displayName]);
+  console.log(table.toString());
 }
