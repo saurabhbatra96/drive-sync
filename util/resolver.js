@@ -6,6 +6,7 @@ var listFiles = require(appRoot+'/src/ls.js');
 var changeDir = require(appRoot+'/src/cd.js');
 var currDir = require(appRoot+'/src/pwd.js');
 var logout = require(appRoot+'/src/logout.js');
+var download = require(appRoot+'/src/down.js');
 
 module.exports = function(cmd, value) {
 	switch(cmd) {
@@ -20,6 +21,9 @@ module.exports = function(cmd, value) {
 			break;
 		case 'logout':
 			logout();
+			break;
+		case 'down':
+			download(value, pwd);
 			break;
 	}
 }
