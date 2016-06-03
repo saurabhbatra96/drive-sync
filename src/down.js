@@ -10,6 +10,7 @@ var google = require('googleapis');
 var ProgressBar = require('progress');
 
 var authtoken = require(appRoot+'/src/auth.js');
+var exportDoc = require(appRoot+'/src/export.js');
 var mimetypes = require(appRoot+'/util/mimetypes.js');
 var auth = authtoken();
 
@@ -26,7 +27,12 @@ module.exports = function(filename, pwd) {
     return;
   }
 
-  download(found, filename);
+  if (mimetypes.isDoc(found.mimeType)) {
+    exportDoc(filename, null);
+    return;
+  }
+
+  download(found.id, filename);
 }
 
 
@@ -37,7 +43,7 @@ function findFile(filename, pwd) {
 	service.files.list({
 		q: "'"+pwd+"' in parents",
 		auth: auth,
-		fields: "files(name, id)",
+		fields: "files(name, id, mimeType)",
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
@@ -52,7 +58,7 @@ function findFile(filename, pwd) {
       		for (var i = 0; i < files.length; i++) {
         		var file = files[i];
         		if (filename == file.name) {
-        			found = file.id;
+        			found = file;
         		}
       		}
     	}
@@ -133,8 +139,8 @@ function downloadAll(pwd) {
     if (!mimetypes.isFolder(file.mimeType) && !mimetypes.isDoc(file.mimeType)) {
       download(file.id, file.name);
     }
-    // if (!mimetypes.isFolder(file.mimeType) && mimetypes.isDoc(file.mimeType)) {
-    //   exportDoc(file, null);
-    // }
+    if (!mimetypes.isFolder(file.mimeType) && mimetypes.isDoc(file.mimeType)) {
+      exportDoc(file.name, null);
+    }
   }
 }

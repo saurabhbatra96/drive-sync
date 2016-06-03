@@ -19,39 +19,52 @@ $ npm link
 Currently the working CLI options include:
 
 - **ls**
-	- `Usage: $ drive-sync ls`
-	- `Description: List files in current folder.`
+	- Usage: `$ drive-sync ls`
+	- Description: List files in current folder.
 
 - **cd**
-  - `Usage:`
+  - Usage:
     - `$ drive-sync cd <folder-name>`
     - `$ drive-sync cd ..`
     - `$ drive-sync cd`
-  - `Description:`
-    - `Change working directory to <folder-name>`
-    - `Change working directory to the one above.`
-    - `Change working directory to root.`
+  - Description:
+    - Change working directory to <folder-name>
+    - Change working directory to the one above.
+    - Change working directory to root.
 
 - **pwd**
-	- `Usage: $ drive-sync pwd`
-	- `Description: Expose information about the current folder.`
+	- Usage: `$ drive-sync pwd`
+	- Description: Expose information about the current folder.
 
 - **down**
-	- `Usage:`
+	- Usage:
 		- `$ drive-sync down <file-name>`
 		- `$ drive-sync down all`
 		- `$ drive-sync down all --filter` (Not yet implemented.)
-	- `Description:`
-		- `Download <file-name> from Drive to the directory you are currently in.`
-		- `Download all the files in the directory you are currently in.`
-		- `Download all files matching the following filters:`
+	- Description:
+		- Download <file-name> from Drive to the directory you are currently in.
+		- Download all the files in the directory you are currently in.
+		- Download all files matching the following filters:
 			- `image: all files of the type image (png, jpg, gif, svg)`
 			- `pdf: all files of the type pdf`
 			- `zip: all files of the type zip`
+	- `Note: If there are Google Docs in your folder, they will be converted to default formats and exported as well. For advanced options see drive-sync export.`
+
+- **export**
+	- Usage: `$ drive-sync export <doc-name> <format>`
+	- Description: Export your docs (doc or spreadsheet) in the following supported formats for documents:
+		- `html`
+		- `pdf`
+		- `doc (default)`
+		- `txt`
+
+		and for Spreadsheets
+		- `xls (default for sheets)`
+		- `csv (only exports the first sheet)`
 
 - **logout**
-	- `Usage: $ drive-sync logout`
-	- `Description: Logout from your account.`
+	- Usage: `$ drive-sync logout`
+	- Description: Logout from your account.
 
 ## Technologies
 NodeJS, God knows what else.

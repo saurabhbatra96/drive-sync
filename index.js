@@ -25,9 +25,9 @@ var resolver = require(appRoot+'/util/resolver.js');
 // Send the command to our resolver.
 program
 	.version('0.0.1')
-	.arguments('<cmd> [value]')
-	.action(function(cmd, value) {
-		resolver(cmd, value);
+	.arguments('<cmd> [value] [opt]')
+	.action(function(cmd, value, opt) {
+		resolver(cmd, value, opt);
 	});
 
 program.parse(process.argv);
