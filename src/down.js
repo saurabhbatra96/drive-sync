@@ -8,6 +8,7 @@ var deasync = require('deasync');
 var fs = require('fs');
 var google = require('googleapis');
 var authtoken = require(appRoot+'/src/auth.js');
+var mimetypes = require(appRoot+'/util/mimetypes.js');
 var auth = authtoken();
 
 module.exports = function(filename, pwd) {
@@ -93,7 +94,7 @@ function downloadAll(pwd) {
 	service.files.list({
 		q: "'"+pwd+"' in parents",
 		auth: auth,
-		fields: "files(name, id)",
+		fields: "files(name, id, mimeType)",
 	}, function(err, response) {
 		if (err) {
 			console.log('The API returned an error: ' + err);
@@ -114,6 +115,11 @@ function downloadAll(pwd) {
 
   for (var i = 0; i < filelist.length; i++) {
     var file = filelist[i];
-    download(file.id, file.name);
+    if (!mimetypes.isFolder(file.mimeType) && !mimetypes.isDoc(file.mimeType)) {
+      download(file.id, file.name);
+    }
+    // if (!mimetypes.isFolder(file.mimeType) && mimetypes.isDoc(file.mimeType)) {
+    //   exportDoc(file, null);
+    // }
   }
 }
