@@ -11,10 +11,10 @@ var authtoken = require(appRoot+'/src/auth.js');
 var auth = authtoken();
 
 module.exports = function(filename, pwd) {
-  // if (filename == 'all') {
-  //   downloadAll(pwd);
-  //   return;
-  // }
+  if (filename == 'all') {
+    downloadAll(pwd);
+    return;
+  }
 
   var found = findFile(filename, pwd);
 
@@ -86,31 +86,34 @@ function download(fileId, filename) {
 	while(sync) {deasync.sleep(100);}
 }
 
-// function downloadAll(pwd) {
-// 	var service = google.drive('v3');
-// 	service.files.list({
-// 		q: "'"+pwd+"' in parents",
-// 		auth: auth,
-// 		fields: "files(name, id)",
-// 	}, function(err, response) {
-// 		if (err) {
-// 			console.log('The API returned an error: ' + err);
-//       		return;
-// 		}
-//
-// 		var files = response.files;
-// 		if (files.length == 0) {
-//       		console.log('Empty directory.');
-//       		return false;
-//     	} else {
-//       		for (var i = 0; i < files.length; i++) {
-//             var sync = true;
-//         		var file = files[i];
-//             download(file.id, file.name).on('end', function() {
-//               sync = false;
-//             });
-//             while(sync) {deasync.sleep(100);}
-//       		}
-//     	}
-// 	});
-// }
+function downloadAll(pwd) {
+  var sync = true;
+  var filelist;
+	var service = google.drive('v3');
+	service.files.list({
+		q: "'"+pwd+"' in parents",
+		auth: auth,
+		fields: "files(name, id)",
+	}, function(err, response) {
+		if (err) {
+			console.log('The API returned an error: ' + err);
+      		return;
+		}
+
+		var files = response.files;
+		if (files.length == 0) {
+      		console.log('Empty directory.');
+      		return false;
+    	} else {
+      		filelist = files;
+          sync = false;
+    	}
+	});
+
+  while(sync) {deasync.sleep(100)};
+
+  for (var i = 0; i < filelist.length; i++) {
+    var file = filelist[i];
+    download(file.id, file.name);
+  }
+}
