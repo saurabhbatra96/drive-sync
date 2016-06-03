@@ -32,10 +32,14 @@ Currently the working CLI options include:
     - `Change working directory to the one above.`
     - `Change working directory to root.`
 
+- **pwd**
+	- `Usage: $ drive-sync pwd`
+	- `Description: Expose information about the current folder.`
+
 - **down**
 	- `Usage:`
 		- `$ drive-sync down <file-name>`
-		- `$ drive-sync down all` (Not yet implemented.)
+		- `$ drive-sync down all`
 		- `$ drive-sync down all --filter` (Not yet implemented.)
 	- `Description:`
 		- `Download <file-name> from Drive to the directory you are currently in.`
