@@ -7,6 +7,8 @@
 var deasync = require('deasync');
 var fs = require('fs');
 var google = require('googleapis');
+var ProgressBar = require('progress');
+
 var authtoken = require(appRoot+'/src/auth.js');
 var mimetypes = require(appRoot+'/util/mimetypes.js');
 var auth = authtoken();
@@ -65,6 +67,7 @@ function findFile(filename, pwd) {
 function download(fileId, filename) {
   var sync = true;
   var dest = fs.createWriteStream('./'+filename);
+  var bar;
 
   console.log('Download of %s initiated.', filename);
 
@@ -74,6 +77,18 @@ function download(fileId, filename) {
 		alt: "media",
 		auth: auth
 	})
+  .on('response', function(res) {
+    var len = parseInt(res.headers['content-length'], 10);
+    bar = new ProgressBar('  downloading [:bar] :percent :etas', {
+      complete: '=',
+      incomplete: ' ',
+      width: 20,
+      total: len
+    });
+  })
+  .on('data', function(chunk) {
+    bar.tick(chunk.length);
+  })
   .on('end', function() {
     console.log('%s downloaded.', filename);
     sync = false;
