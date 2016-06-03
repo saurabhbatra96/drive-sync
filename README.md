@@ -1,4 +1,4 @@
-# Google Drive Sync (Alpha)
+# Google Drive Sync (Beta)
 
 [![Gitter badge](https://badges.gitter.im/saurabhbatra96/drive-sync.svg)](https://gitter.im/saurabhbatra96/drive-sync?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
