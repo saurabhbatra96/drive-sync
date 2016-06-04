@@ -54,7 +54,7 @@ function authorize(credentials) {
   try {
     var token = fs.readFileSync(TOKEN_PATH);
   } catch(e) {
-    if (e.errno == 34)
+    if (e.code == 'ENOENT')
       return getNewToken(oauth2Client);
     console.log(e);
     return;
