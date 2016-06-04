@@ -1,3 +1,19 @@
+//	drive-sync
+//  Copyright (C) 2016  Saurabh Batra
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 // auth.js
 
 // Code for authenticating the user.
@@ -10,8 +26,6 @@ var googleAuth = require('google-auth-library');
 var readlineSync = require('readline-sync');
 var deasync = require('deasync');
 
-// If modifying these scopes, delete your previously saved credentials
-// at ~/.credentials/drive-nodejs-quickstart.json
 var SCOPES = ['https://www.googleapis.com/auth/drive'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';
@@ -54,7 +68,7 @@ function getNewToken(oauth2Client) {
     access_type: 'offline',
     scope: SCOPES
   });
-  console.log('Authorize this app by visiting this url: ', authUrl);
+  console.log('Authorize drive-sync by visiting this url: ', authUrl);
 
   var code = readlineSync.question('Enter the code given on that page here: ');
 

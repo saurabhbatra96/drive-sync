@@ -1,6 +1,7 @@
 # Google Drive Sync (Beta)
 
 [![Gitter badge](https://badges.gitter.im/saurabhbatra96/drive-sync.svg)](https://gitter.im/saurabhbatra96/drive-sync?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 ## Aim
 To generate a native terminal application which can be used to browse, download/upload files and sync your Google Drive with a local folder.
@@ -66,5 +67,8 @@ Currently the working CLI options include:
 	- Usage: `$ drive-sync logout`
 	- Description: Logout from your account.
 
+## License
+This program is licensed under the GNU GPL v3 license. Check out License.txt for more details.
+
 ## Technologies
-NodeJS, God knows what else.
+NodeJS.
