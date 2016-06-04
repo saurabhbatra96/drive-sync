@@ -26,6 +26,11 @@ var googleAuth = require('google-auth-library');
 var readlineSync = require('readline-sync');
 var deasync = require('deasync');
 
+var proxy = fs.readFileSync(appRoot+'/proxy.txt')
+if (proxy != "") {
+  google.options({ proxy: proxy });
+}
+
 var SCOPES = ['https://www.googleapis.com/auth/drive'];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials/';

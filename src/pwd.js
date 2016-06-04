@@ -21,6 +21,11 @@
 
 var deasync = require('deasync');
 var google = require('googleapis');
+var fs = require('fs');
+var proxy = fs.readFileSync(appRoot+'/proxy.txt')
+if (proxy != "") {
+  google.options({ proxy: proxy });
+}
 var tablify = require(appRoot+'/util/tablify.js');
 var authtoken = require(appRoot+'/src/auth.js');
 var auth = authtoken();
