@@ -66,7 +66,10 @@ function findFolder(dir, pwd) {
       		for (var i = 0; i < files.length; i++) {
         		var file = files[i];
         		if (dir == file.name) {
-        			found = file.id;
+					if(file.mimeType=="application/vnd.google-apps.folder")
+        				found = file.id;
+					else
+						console.log('Please Enter a Valid Directory Name');
         		}
       		}
     	}
