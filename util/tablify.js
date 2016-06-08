@@ -40,6 +40,9 @@ function tablifyLs(files) {
 
   for (var i = 0; i < files.length; i++) {
     var file = files[i];
+    if (file.name.length>=20){
+        file.name=file.name.substring(0,20)+"..";
+    }
     file = beautifyLs(file);
     table.push([file.name, file.mimeType]);
   }
