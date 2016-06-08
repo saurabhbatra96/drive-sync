@@ -37,7 +37,7 @@ module.exports = function(dir, pwd) {
 	var found = findFolder(dir,pwd);
 
 	if (!found) {
-		console.log('No such folder as %s in %s.', dir, pwd);
+		console.log('No such folder as %s in current directory.', dir);
 		return;
 	}
 
@@ -66,10 +66,9 @@ function findFolder(dir, pwd) {
       		for (var i = 0; i < files.length; i++) {
         		var file = files[i];
         		if (dir == file.name) {
-					if(file.mimeType=="application/vnd.google-apps.folder")
+							if (file.mimeType == 'application/vnd.google-apps.folder') {
         				found = file.id;
-					else
-						console.log('Please Enter a Valid Directory Name');
+							}
         		}
       		}
     	}
