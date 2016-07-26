@@ -72,3 +72,6 @@ This program is licensed under the GNU GPL v3 license. Check out License.txt for
 
 ## Technologies
 NodeJS.
+
+## Working with a HTTP Proxy
+If you have correctly configured your proxy settings in `/etc/environment`, `drive-sync` should work as expected. File an issue if not so.
